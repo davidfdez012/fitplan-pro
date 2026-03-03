@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="bg-page text-foreground">
@@ -17,12 +19,15 @@ function Navbar() {
   return (
     <header className="sticky top-0 z-20 -mx-4 mb-10 border-b border-white/5 bg-background/80 px-4 py-4 backdrop-blur-md sm:mx-0 sm:rounded-3xl sm:border sm:px-6 lg:px-8">
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-sm font-semibold tracking-tight text-white">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm font-semibold tracking-tight text-white"
+        >
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-accent text-xs text-black shadow-[0_0_24px_rgba(173,250,29,0.6)]">
             FP
           </span>
           <span className="text-base">Fit Plan Pro</span>
-        </div>
+        </Link>
 
         <div className="hidden items-center gap-8 text-xs font-medium text-muted-foreground md:flex">
           <a href="#programas" className="hover:text-white">
@@ -37,18 +42,18 @@ function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#login"
+          <Link
+            href="/login"
             className="hidden text-xs font-medium text-muted-foreground hover:text-white sm:inline"
           >
             Iniciar sesión
-          </a>
-          <a
-            href="#precios"
+          </Link>
+          <Link
+            href="/login"
             className="inline-flex items-center rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-black shadow-[0_0_24px_rgba(173,250,29,0.6)] hover:bg-accent/90"
           >
             Empieza gratis
-          </a>
+          </Link>
         </div>
       </nav>
     </header>
@@ -77,12 +82,12 @@ function Hero() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <a
-            href="#precios"
+          <Link
+            href="/login"
             className="inline-flex items-center justify-center rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-black shadow-[0_0_32px_rgba(173,250,29,0.5)] hover:bg-accent/90"
           >
             Empieza tu cambio
-          </a>
+          </Link>
           <p className="text-xs text-muted-foreground sm:text-[13px]">
             Resultados medibles desde las primeras 4 semanas. Sin permanencia.
           </p>
@@ -275,12 +280,12 @@ function Pricing() {
             <li>• Recomendaciones generales de nutrición.</li>
             <li>• Registro básico de progreso en la app.</li>
           </ul>
-          <a
-            href="#login"
+          <Link
+            href="/login"
             className="mt-auto inline-flex items-center justify-center rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:bg-white/5"
           >
             Empezar con Starter
-          </a>
+          </Link>
         </div>
 
         <div className="relative flex flex-col rounded-3xl border border-accent bg-gradient-to-b from-accent-soft to-black/80 p-5 text-sm shadow-[0_0_40px_rgba(173,250,29,0.35)]">
@@ -303,12 +308,12 @@ function Pricing() {
             <li>• Envío de vídeos de técnica y feedback detallado.</li>
             <li>• Soporte por chat dentro de la app (respuesta en 24 h).</li>
           </ul>
-          <a
-            href="#login"
+          <Link
+            href="/login"
             className="mt-auto inline-flex items-center justify-center rounded-full bg-accent px-4 py-2 text-xs font-semibold text-black hover:bg-accent/90"
           >
             Empezar con Plan Pro
-          </a>
+          </Link>
         </div>
 
         <div className="flex flex-col rounded-3xl border border-white/10 bg-black/40 p-5 text-sm">
@@ -327,12 +332,12 @@ function Pricing() {
             <li>• Llamadas de seguimiento individuales periódicas.</li>
             <li>• Coordinación con otros profesionales (fisioterapia, etc.).</li>
           </ul>
-          <a
-            href="#login"
+          <Link
+            href="/login"
             className="mt-auto inline-flex items-center justify-center rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:bg-white/5"
           >
             Solicitar plaza Elite
-          </a>
+          </Link>
         </div>
       </div>
     </section>
