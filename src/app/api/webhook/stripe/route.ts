@@ -4,39 +4,38 @@ import { createClient } from "@supabase/supabase-js";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!stripeSecretKey) {
   throw new Error("STRIPE_SECRET_KEY no está configurado");
 }
 
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2026-02-25.clover",
-});
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!webhookSecret) {
+  throw new Error("STRIPE_WEBHOOK_SECRET no está configurado");
+}
 
 if (!supabaseUrl) {
   throw new Error("NEXT_PUBLIC_SUPABASE_URL no está configurado");
 }
 
 if (!supabaseServiceRoleKey) {
-  throw new Error(
-    "SUPABASE_SERVICE_ROLE_KEY no está configurado. Añádelo a tu .env.local.",
-  );
+  throw new Error("SUPABASE_SERVICE_ROLE_KEY no está configurado");
 }
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: "2026-02-25.clover",
+});
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 export async function POST(request: NextRequest) {
   const sig = request.headers.get("stripe-signature");
 
-  if (!webhookSecret || !sig) {
-    console.error(
-      "Webhook Stripe mal configurado: falta STRIPE_WEBHOOK_SECRET o stripe-signature",
-    );
+  if (!sig) {
+    console.error("Stripe webhook sin cabecera stripe-signature");
     return NextResponse.json(
-      { error: "Webhook no configurado correctamente" },
+      { error: "Falta stripe-signature" },
       { status: 400 },
     );
   }
@@ -53,17 +52,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Firma inválida" }, { status: 400 });
   }
 
+  console.log("Stripe webhook event type:", event.type);
+
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const email =
-        session.customer_details && session.customer_details.email
-          ? session.customer_details.email
-          : session.customer_email;
+        session.customer_details?.email ?? session.customer_email ?? null;
 
       if (!email) {
         console.warn(
-          "checkout.session.completed sin email. No se puede actualizar perfil.",
+          "checkout.session.completed sin email; no se puede actualizar el perfil.",
         );
       } else {
         const normalizedEmail = email.toLowerCase();
@@ -77,13 +76,11 @@ export async function POST(request: NextRequest) {
           console.error("Error actualizando plan a pro:", error);
         } else {
           console.log(
-            "Perfil actualizado a PRO para el email:",
+            "Perfil actualizado a PRO correctamente para:",
             normalizedEmail,
           );
         }
       }
-    } else {
-      console.log("Evento de Stripe ignorado:", event.type);
     }
   } catch (error) {
     console.error("Error manejando webhook de Stripe:", error);
