@@ -21,6 +21,7 @@ const stripe = new Stripe(stripeSecretKey || '', {
 const supabaseAdmin = createClient(supabaseUrl || '', supabaseServiceRoleKey || '');
 
 export async function POST(request: NextRequest) {
+  console.log("DEBUG - Inicio Secreto:", process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 10));
   const sig = request.headers.get("stripe-signature");
 
   if (!sig || !webhookSecret) {
