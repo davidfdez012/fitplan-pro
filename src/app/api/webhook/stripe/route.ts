@@ -1,3 +1,4 @@
+// Despliegue de limpieza verificado el 03-03-2026
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
