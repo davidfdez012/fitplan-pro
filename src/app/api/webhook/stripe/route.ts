@@ -21,15 +21,22 @@ const stripe = new Stripe(stripeSecretKey || '', {
 const supabaseAdmin = createClient(supabaseUrl || '', supabaseServiceRoleKey || '');
 
 export async function POST(request: NextRequest) {
-  console.log("DEBUG - Inicio Secreto:", process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 10));
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  // LOGS DE DIAGNÓSTICO CRÍTICOS
+  console.log("--- DIAGNÓSTICO WEBHOOK ---");
+  console.log("¿Existe secreto?:", !!webhookSecret);
+  console.log("Inicio del secreto detectado:", webhookSecret?.substring(0, 10));
+  console.log("Longitud del secreto:", webhookSecret?.length);
+  console.log("---------------------------");
+
   const sig = request.headers.get("stripe-signature");
+  const body = await request.text();
 
   if (!sig || !webhookSecret) {
     return NextResponse.json({ error: "Configuración incompleta" }, { status: 400 });
   }
 
-  // OBTENER RAW BODY
-  const body = await request.text();
   console.log("Stripe webhook body length:", body.length);
 
   let event: Stripe.Event;
