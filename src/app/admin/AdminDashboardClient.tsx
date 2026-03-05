@@ -1,7 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Users, DollarSign, TrendingUp, Activity, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Users,
+  DollarSign,
+  TrendingUp,
+  Activity,
+  Search,
+} from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 export type AdminProfile = {
@@ -13,14 +21,27 @@ export type AdminProfile = {
   created_at: string | null;
 };
 
+export type AdminRoutine = {
+  id: string;
+  title: string | null;
+  content: string | null;
+};
+
 const PRO_PRICE_EUR = 59;
 
 export default function AdminDashboardClient({
   profiles,
+  routine,
 }: {
   profiles: AdminProfile[];
+  routine: AdminRoutine | null;
 }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [routineTitle, setRoutineTitle] = useState(routine?.title || "");
+  const [routineContent, setRoutineContent] = useState(routine?.content || "");
+  const [savingRoutine, setSavingRoutine] = useState(false);
 
   const totalUsers = profiles.length;
   const totalPro = profiles.filter(
@@ -49,6 +70,67 @@ export default function AdminDashboardClient({
       month: "2-digit",
       year: "2-digit",
     });
+  };
+
+  const handleTogglePlan = async (profile: AdminProfile) => {
+    const isProRow = (profile.plan || "").toLowerCase() === "pro";
+    const makePro = !isProRow;
+
+    try {
+      setUpdatingId(profile.id);
+      const response = await fetch("/api/admin/profiles/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileId: profile.id, makePro }),
+      });
+
+      if (!response.ok) {
+        toast.error("No se ha podido actualizar el plan.");
+        return;
+      }
+
+      toast.success(
+        makePro
+          ? "Plan actualizado a PRO correctamente."
+          : "Plan cambiado a FREE correctamente.",
+      );
+      router.refresh();
+    } catch (error) {
+      toast.error("Ha ocurrido un error al actualizar el plan.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleSaveRoutine = async () => {
+    if (!routineTitle.trim() || !routineContent.trim()) {
+      toast.error("Título y contenido son obligatorios.");
+      return;
+    }
+
+    try {
+      setSavingRoutine(true);
+      const response = await fetch("/api/admin/routines", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: routineTitle.trim(),
+          content: routineContent.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        toast.error("No se ha podido guardar la rutina.");
+        return;
+      }
+
+      toast.success("Rutina de la semana guardada correctamente.");
+      router.refresh();
+    } catch (error) {
+      toast.error("Ha ocurrido un error al guardar la rutina.");
+    } finally {
+      setSavingRoutine(false);
+    }
   };
 
   return (
@@ -172,6 +254,7 @@ export default function AdminDashboardClient({
                   <th className="py-2 pr-4">Plan</th>
                   <th className="py-2 pr-4">Objetivo</th>
                   <th className="py-2 pr-4">Registro</th>
+                  <th className="py-2 pr-4">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -217,6 +300,21 @@ export default function AdminDashboardClient({
                           {formatDate(profile.created_at)}
                         </span>
                       </td>
+                      <td className="py-2 pr-0 align-top">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-7 rounded-full px-3 text-[10px]"
+                          disabled={updatingId === profile.id}
+                          onClick={() => handleTogglePlan(profile)}
+                        >
+                          {updatingId === profile.id
+                            ? "Actualizando..."
+                            : isProRow
+                            ? "Quitar PRO"
+                            : "Hacer PRO"}
+                        </Button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -224,7 +322,7 @@ export default function AdminDashboardClient({
                 {filteredProfiles.length === 0 && (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       className="py-6 text-center text-[11px] text-zinc-500"
                     >
                       No se han encontrado alumnos con ese criterio.
@@ -233,6 +331,55 @@ export default function AdminDashboardClient({
                 )}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-zinc-900 bg-zinc-950/70 p-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-500">
+                Rutina de la semana
+              </p>
+              <p className="mt-1 text-xs text-zinc-500">
+                Define el foco principal para tus alumnos PRO.
+              </p>
+            </div>
+          </div>
+          <div className="space-y-3 text-xs">
+            <div className="space-y-1">
+              <label className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+                Título
+              </label>
+              <input
+                type="text"
+                value={routineTitle}
+                onChange={(event) => setRoutineTitle(event.target.value)}
+                className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 outline-none ring-0 transition focus:border-lime-300 focus:ring-1 focus:ring-lime-300"
+                placeholder="Ej. Torso fuerza · Semana 3"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+                Descripción / Indicaciones
+              </label>
+              <textarea
+                value={routineContent}
+                onChange={(event) => setRoutineContent(event.target.value)}
+                rows={4}
+                className="w-full resize-none rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 outline-none ring-0 transition focus:border-lime-300 focus:ring-1 focus:ring-lime-300"
+                placeholder="Resumen de la estructura semanal, foco de intensidad, recomendaciones clave..."
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                className="h-8 rounded-full px-4 text-[11px]"
+                disabled={savingRoutine}
+                onClick={handleSaveRoutine}
+              >
+                {savingRoutine ? "Guardando..." : "Guardar rutina"}
+              </Button>
+            </div>
           </div>
         </section>
       </main>

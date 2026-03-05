@@ -24,6 +24,8 @@ export default function DashboardPage() {
   const [editingName, setEditingName] = useState("");
   const [editingGoal, setEditingGoal] = useState("");
   const [upgrading, setUpgrading] = useState(false);
+  const [routine, setRoutine] = useState<string | null>(null);
+  const [routineError, setRoutineError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -51,6 +53,30 @@ export default function DashboardPage() {
           setProfile(typed);
           setEditingName(typed.full_name ?? "");
           setEditingGoal(typed.fitness_goal ?? "");
+
+          const normalizedPlan = (typed.plan || "free").toLowerCase();
+          if (normalizedPlan === "pro") {
+            try {
+              const { data: routineData, error: routineErr } = await supabase
+                .from("routines")
+                .select("title, content, created_at")
+                .order("created_at", { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+              if (routineErr) {
+                setRoutineError(
+                  "No hemos podido cargar la rutina de la semana.",
+                );
+              } else if (routineData) {
+                const title = routineData.title || "Rutina de la semana";
+                const content = routineData.content || "";
+                setRoutine(`${title} — ${content}`);
+              }
+            } catch (routineCatchError) {
+              setRoutineError("Error cargando la rutina de la semana.");
+            }
+          }
         }
       } catch (e) {
         setError("Ha ocurrido un error al cargar tu panel.");
@@ -300,38 +326,22 @@ export default function DashboardPage() {
             {isPro && (
               <div className="mt-5 rounded-3xl border border-yellow-300/40 bg-gradient-to-br from-yellow-500/10 via-amber-500/5 to-lime-400/10 p-4 text-xs text-muted-foreground">
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-yellow-300">
-                  Contenido exclusivo PRO
+                  Rutina de la semana (PRO)
                 </p>
-                <p className="mt-2 text-sm text-white">
-                  Accede a rutinas avanzadas, bloques de fuerza y plantillas de
-                  programación de alto rendimiento.
-                </p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl bg-black/50 p-3">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                      Bloque fuerza
-                    </p>
-                    <p className="mt-1 text-xs text-white">
-                      12 semanas de progresión en básicos.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-black/50 p-3">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                      Hipertrofia avanzada
-                    </p>
-                    <p className="mt-1 text-xs text-white">
-                      Torso/pierna con alto foco en volumen efectivo.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-black/50 p-3">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                      Rutinas EXPRESS
-                    </p>
-                    <p className="mt-1 text-xs text-white">
-                      Sesiones de 45&apos; para días con poco tiempo.
-                    </p>
-                  </div>
-                </div>
+                {routine && (
+                  <p className="mt-2 whitespace-pre-line text-sm text-white">
+                    {routine}
+                  </p>
+                )}
+                {!routine && !routineError && (
+                  <p className="mt-2 text-sm text-zinc-300">
+                    Aún no hay una rutina de la semana configurada. Se mostrará
+                    aquí cuando tu coach la publique.
+                  </p>
+                )}
+                {routineError && (
+                  <p className="mt-2 text-sm text-red-300">{routineError}</p>
+                )}
               </div>
             )}
           </div>

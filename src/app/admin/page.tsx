@@ -1,14 +1,20 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
 import AdminDashboardClient, {
   AdminProfile,
+  AdminRoutine,
 } from "./AdminDashboardClient";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const adminEmail = process.env.ADMIN_EMAIL;
 
-if (!supabaseUrl || !supabaseServiceRoleKey) {
+if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
   console.error(
-    "❌ Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY para el dashboard de admin.",
+    "❌ Faltan NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY o SUPABASE_SERVICE_ROLE_KEY para el dashboard de admin.",
   );
 }
 
@@ -18,7 +24,37 @@ const supabaseAdmin =
     : null;
 
 export default async function AdminPage() {
+  // Verificación de sesión y correo de administrador
+  if (!supabaseUrl || !supabaseAnonKey || !adminEmail) {
+    redirect("/dashboard");
+  }
+
+  const cookieStore = cookies();
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
+      },
+      set(name: string, value: string, options: any) {
+        cookieStore.set({ name, value, ...options });
+      },
+      remove(name: string, options: any) {
+        cookieStore.delete({ name, ...options });
+      },
+    },
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.email?.toLowerCase() !== adminEmail.toLowerCase()) {
+    redirect("/dashboard");
+  }
+
   let profiles: AdminProfile[] = [];
+  let routine: AdminRoutine | null = null;
 
   if (supabaseAdmin) {
     const { data, error } = await supabaseAdmin
@@ -31,8 +67,21 @@ export default async function AdminPage() {
     } else if (data) {
       profiles = data as AdminProfile[];
     }
+
+    const { data: routineData, error: routineError } = await supabaseAdmin
+      .from("routines")
+      .select("id, title, content, created_at")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (routineError) {
+      console.error("Error obteniendo rutina para admin:", routineError);
+    } else if (routineData) {
+      routine = routineData as AdminRoutine;
+    }
   }
 
-  return <AdminDashboardClient profiles={profiles} />;
+  return <AdminDashboardClient profiles={profiles} routine={routine} />;
 }
 
