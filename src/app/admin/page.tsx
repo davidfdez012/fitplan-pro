@@ -29,7 +29,7 @@ export default async function AdminPage() {
     redirect("/dashboard");
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
