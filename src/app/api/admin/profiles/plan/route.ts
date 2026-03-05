@@ -27,18 +27,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const cookieStore = cookies();
+  // 1. Await obligatorio en Next.js 15
+  const cookieStore = await cookies();
 
+  // 2. Bloque blindado con try/catch para evitar errores de TypeScript en Build
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
       set(name: string, value: string, options: any) {
-        cookieStore.set({ name, value, ...options });
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch (error) {
+          // Ignoramos el error si se llama desde un Server Component de solo lectura
+        }
       },
       remove(name: string, options: any) {
-        cookieStore.delete({ name, ...options });
+        try {
+          cookieStore.set({ name, value: "", ...options });
+        } catch (error) {
+          // Usamos set con valor vacío en lugar de delete() para evitar incompatibilidades de tipos
+        }
       },
     },
   });
@@ -83,4 +93,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ success: true, plan: newPlan });
 }
-
