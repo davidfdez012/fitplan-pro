@@ -171,6 +171,9 @@ export default function DashboardPage() {
 
   const displayName =
     profile.full_name || profile.email || "Atleta Fit Plan Pro";
+  const normalizedPlan = (profile.plan || "free").toLowerCase();
+  const isPro = normalizedPlan === "pro";
+  const planLabel = isPro ? "PRO" : "FREE";
 
   return (
     <div className="bg-page text-foreground">
@@ -188,6 +191,11 @@ export default function DashboardPage() {
                 Panel de entrenamiento
               </h1>
             </div>
+            {isPro && (
+              <span className="rounded-full bg-gradient-to-r from-yellow-300 via-amber-400 to-lime-300 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black shadow-[0_0_24px_rgba(250,204,21,0.7)]">
+                MIEMBRO ELITE
+              </span>
+            )}
           </div>
 
           <Button
@@ -209,9 +217,7 @@ export default function DashboardPage() {
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Estás en el plan{" "}
-              <span className="font-semibold text-accent">
-                {profile.plan || "starter"}
-              </span>
+              <span className="font-semibold text-accent">{planLabel}</span>
               {profile.fitness_goal
                 ? ` con foco en ${profile.fitness_goal.toLowerCase()}.`
                 : ". Define tu objetivo para personalizar aún más tu experiencia."}
@@ -290,6 +296,44 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
+
+            {isPro && (
+              <div className="mt-5 rounded-3xl border border-yellow-300/40 bg-gradient-to-br from-yellow-500/10 via-amber-500/5 to-lime-400/10 p-4 text-xs text-muted-foreground">
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-yellow-300">
+                  Contenido exclusivo PRO
+                </p>
+                <p className="mt-2 text-sm text-white">
+                  Accede a rutinas avanzadas, bloques de fuerza y plantillas de
+                  programación de alto rendimiento.
+                </p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-black/50 p-3">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                      Bloque fuerza
+                    </p>
+                    <p className="mt-1 text-xs text-white">
+                      12 semanas de progresión en básicos.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-black/50 p-3">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                      Hipertrofia avanzada
+                    </p>
+                    <p className="mt-1 text-xs text-white">
+                      Torso/pierna con alto foco en volumen efectivo.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-black/50 p-3">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                      Rutinas EXPRESS
+                    </p>
+                    <p className="mt-1 text-xs text-white">
+                      Sesiones de 45&apos; para días con poco tiempo.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -299,14 +343,14 @@ export default function DashboardPage() {
               </p>
             )}
 
-            {profile.plan === "starter" && (
+            {!isPro && (
               <div className="rounded-3xl border border-accent bg-gradient-to-b from-accent-soft to-black/80 p-4 text-xs text-muted-foreground shadow-[0_0_40px_rgba(173,250,29,0.35)]">
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-accent">
-                  PLAN PRO DISPONIBLE
+                  DESBLOQUEA TU POTENCIAL
                 </p>
                 <p className="mt-2 text-sm text-white">
-                  Sube al siguiente nivel con un acompañamiento completo y
-                  revisiones semanales de tu plan.
+                  Desbloquea el máximo potencial. Hazte PRO para ver rutinas
+                  exclusivas y dietas personalizadas adaptadas a tu objetivo.
                 </p>
                 <Button
                   type="button"
@@ -314,7 +358,7 @@ export default function DashboardPage() {
                   disabled={upgrading}
                   onClick={handleUpgradeToPro}
                 >
-                  {upgrading ? "Conectando con Stripe..." : "Mejorar a Plan Pro"}
+                  {upgrading ? "Conectando con Stripe..." : "Mejorar a Plan PRO"}
                 </Button>
               </div>
             )}
@@ -340,6 +384,62 @@ export default function DashboardPage() {
                   técnico.
                 </li>
               </ul>
+            </div>
+
+            <div className="relative rounded-3xl border border-white/10 bg-black/50 p-4 text-xs text-muted-foreground">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Librería de rutinas
+              </p>
+              <div
+                className={`mt-3 grid gap-3 sm:grid-cols-3 ${
+                  isPro ? "" : "pointer-events-none"
+                }`}
+              >
+                <div
+                  className={`rounded-2xl bg-black/60 p-3 ${
+                    isPro ? "" : "blur-[1px] opacity-70"
+                  }`}
+                >
+                  <p className="text-[11px] uppercase tracking-[0.16em]">
+                    Push / Pull / Legs
+                  </p>
+                  <p className="mt-1 text-xs text-white">
+                    Dividida clásica optimizada para fuerza e hipertrofia.
+                  </p>
+                </div>
+                <div
+                  className={`rounded-2xl bg-black/60 p-3 ${
+                    isPro ? "" : "blur-[1px] opacity-70"
+                  }`}
+                >
+                  <p className="text-[11px] uppercase tracking-[0.16em]">
+                    Torso / Pierna 4D
+                  </p>
+                  <p className="mt-1 text-xs text-white">
+                    Rutina intermedia con foco en básicos pesados.
+                  </p>
+                </div>
+                <div
+                  className={`rounded-2xl bg-black/60 p-3 ${
+                    isPro ? "" : "blur-[1px] opacity-70"
+                  }`}
+                >
+                  <p className="text-[11px] uppercase tracking-[0.16em]">
+                    Fullbody eficiente
+                  </p>
+                  <p className="mt-1 text-xs text-white">
+                    3 sesiones a la semana para agendas apretadas.
+                  </p>
+                </div>
+              </div>
+
+              {!isPro && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-3xl bg-black/65">
+                  <div className="rounded-full border border-accent/60 bg-black/80 px-4 py-2 text-[11px] font-semibold text-accent shadow-[0_0_24px_rgba(173,250,29,0.6)]">
+                    Contenido bloqueado — hazte PRO para desbloquearlo
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
