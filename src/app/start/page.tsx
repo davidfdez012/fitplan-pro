@@ -10,6 +10,8 @@ import {
   HelpCircle,
   Dumbbell,
 } from "lucide-react";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { coachConfig } from "@/config/coach";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
@@ -19,7 +21,8 @@ const fadeInUp = {
 export default function StartPage() {
   return (
     <div className="min-h-screen bg-black text-zinc-50">
-      <main className="mx-auto flex min-h-screen max-w-md flex-col px-5 pb-10 pt-10">
+      <AnimatedBackground />
+      <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col px-5 pb-10 pt-10">
         <motion.section
           className="flex flex-col items-center text-center"
           initial="hidden"
@@ -101,7 +104,7 @@ export default function StartPage() {
             <p className="mt-4 text-xs text-zinc-400">
               Desde{" "}
               <span className="text-base font-semibold text-lime-300">
-                89€ / mes
+                {coachConfig.monthlyPrice}€ / mes
               </span>{" "}
               · Sin permanencia · Plazas reducidas.
             </p>

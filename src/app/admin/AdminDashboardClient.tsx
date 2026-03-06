@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { coachConfig } from "@/config/coach";
 
 export type AdminProfile = {
   id: string;
@@ -20,8 +21,6 @@ export type AdminProfile = {
   plan: string | null;
   created_at: string | null;
 };
-
-const PRO_PRICE_EUR = 59;
 
 export default function AdminDashboardClient({
   profiles,
@@ -38,7 +37,7 @@ export default function AdminDashboardClient({
   ).length;
   const conversionRate =
     totalUsers > 0 ? Math.round((totalPro / totalUsers) * 100) : 0;
-  const estimatedMonthlyRevenue = totalPro * PRO_PRICE_EUR;
+  const estimatedMonthlyRevenue = totalPro * coachConfig.monthlyPrice;
 
   const filteredProfiles = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -138,7 +137,7 @@ export default function AdminDashboardClient({
                 })}
               </p>
               <p className="mt-1 text-[11px] text-zinc-500">
-                {totalPro} alumnos PRO x {PRO_PRICE_EUR}€/mes
+                {totalPro} alumnos PRO x {coachConfig.monthlyPrice}€/mes
               </p>
             </div>
             <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-300">

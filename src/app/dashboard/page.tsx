@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Calendar, FileText, MessageCircle } from "lucide-react";
+import { coachConfig } from "@/config/coach";
 
 type Profile = {
   id: string;
@@ -178,6 +179,10 @@ export default function DashboardPage() {
   const isPro = normalizedPlan === "pro";
   const planLabel = isPro ? "PRO" : "FREE";
 
+  const whatsappUrl = `https://wa.me/${coachConfig.whatsappNumber}?text=${encodeURIComponent(
+    coachConfig.whatsappDefaultMessage
+  )}`;
+
   return (
     <div className="bg-page text-foreground">
       <main className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-10 pt-6 sm:px-6 lg:px-10">
@@ -211,7 +216,7 @@ export default function DashboardPage() {
         </header>
 
         <section className="grid gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          <div className="rounded-3xl border border-white/10 bg-black/60 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.9)]">
+          <div className="rounded-3xl border border-white/10 bg-black/60 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.9)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(217,249,157,0.1)]">
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               BIENVENIDO/A
             </p>
@@ -310,27 +315,27 @@ export default function DashboardPage() {
                 </p>
                 
                 <div className="mt-5 flex flex-col gap-3">
-                  <a href="#" className="flex items-center gap-3 rounded-2xl bg-black/60 p-3 outline-none transition hover:bg-black/80 border border-white/10 hover:border-yellow-300/50">
+                  <a href={coachConfig.meetScheduleLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-black/60 p-3 outline-none transition hover:bg-black/80 border border-white/10 hover:border-yellow-300/50">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-300">
                       <Calendar className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">Paso 1: Agendar Videollamada Inicial</p>
+                      <p className="text-sm font-medium text-white">Paso 1: Agendar Google Meet Inicial</p>
                       <p className="text-[11px] text-zinc-400">Selecciona tu horario para conocernos 1-a-1.</p>
                     </div>
                   </a>
 
-                  <a href="#" className="flex items-center gap-3 rounded-2xl bg-black/60 p-3 outline-none transition hover:bg-black/80 border border-white/10 hover:border-yellow-300/50">
+                  <a href={coachConfig.formLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-black/60 p-3 outline-none transition hover:bg-black/80 border border-white/10 hover:border-yellow-300/50">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-300">
                       <FileText className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">Paso 2: Formulario de Valoración</p>
-                      <p className="text-[11px] text-zinc-400">Cuéntame tu punto de partida al detalle.</p>
+                      <p className="text-sm font-medium text-white">Paso 2: Revisar mi Formulario</p>
+                      <p className="text-[11px] text-zinc-400">Consulta los datos de tu punto de partida.</p>
                     </div>
                   </a>
 
-                  <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-lime-400/20 to-emerald-500/20 p-3 outline-none transition hover:from-lime-400/30 hover:to-emerald-500/30 border border-lime-400/50 shadow-[0_0_20px_rgba(132,204,22,0.2)]">
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-lime-400/20 to-emerald-500/20 p-3 outline-none transition hover:from-lime-400/30 hover:to-emerald-500/30 border border-lime-400/50 shadow-[0_0_20px_rgba(132,204,22,0.2)]">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-400/20 text-lime-400">
                       <MessageCircle className="h-5 w-5" />
                     </div>
@@ -352,22 +357,41 @@ export default function DashboardPage() {
             )}
 
             {!isPro && (
-              <div className="rounded-3xl border border-accent bg-gradient-to-b from-accent-soft to-black/80 p-4 text-xs text-muted-foreground shadow-[0_0_40px_rgba(173,250,29,0.35)]">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-accent">
-                  DESBLOQUEA TU POTENCIAL
-                </p>
-                <p className="mt-2 text-sm text-white">
-                  Desbloquea el máximo potencial. Hazte PRO para ver rutinas
-                  exclusivas y dietas personalizadas adaptadas a tu objetivo.
-                </p>
-                <Button
-                  type="button"
-                  className="mt-3 w-full justify-center"
-                  disabled={upgrading}
-                  onClick={handleUpgradeToPro}
-                >
-                  {upgrading ? "Conectando con Stripe..." : "Mejorar a Plan PRO"}
-                </Button>
+              <div className="flex flex-col gap-4">
+                <div className="rounded-3xl border border-white/10 bg-black/60 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.9)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(217,249,157,0.1)] text-xs text-muted-foreground">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white">
+                    Paso 1: Tu Valoración Gratuita
+                  </p>
+                  <p className="mt-2 text-sm text-zinc-300">
+                    Antes de comenzar, necesito conocer tu punto de partida. Rellena este formulario rápido para que podamos trazar la estrategia ideal para ti.
+                  </p>
+                  <a
+                    href={coachConfig.formLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-zinc-100 px-4 py-2.5 text-xs font-semibold text-black transition-opacity hover:opacity-90"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Rellenar Formulario (Obligatorio)
+                  </a>
+                </div>
+
+                <div className="rounded-3xl border border-accent bg-gradient-to-b from-accent-soft to-black/80 p-5 shadow-[0_0_40px_rgba(173,250,29,0.35)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(217,249,157,0.1)] text-xs text-muted-foreground">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-accent">
+                    Paso 2: Activar Plan Elite
+                  </p>
+                  <p className="mt-2 text-sm text-white">
+                    Desbloquea el máximo potencial. Hazte PRO por {coachConfig.monthlyPrice}€/mes para recibir tus rutinas iniciales y activar el contacto 1-a-1 conmigo.
+                  </p>
+                  <Button
+                    type="button"
+                    className="mt-4 w-full justify-center text-black font-semibold tracking-wide"
+                    disabled={upgrading}
+                    onClick={handleUpgradeToPro}
+                  >
+                    {upgrading ? "Conectando con Stripe..." : "Mejorar a Plan PRO"}
+                  </Button>
+                </div>
               </div>
             )}
 

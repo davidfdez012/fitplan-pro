@@ -296,7 +296,7 @@ function Pricing() {
             Plan Pro
           </p>
           <p className="mb-2 text-lg font-semibold text-white">
-            Desde 59€ / mes
+            Desde 19€ / mes
           </p>
           <p className="mb-4 text-xs text-muted-foreground">
             Acompañamiento completo con planes 100% personalizados y ajustes
