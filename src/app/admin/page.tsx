@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import AdminDashboardClient, {
   AdminProfile,
-  AdminRoutine,
 } from "./AdminDashboardClient";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -57,7 +56,6 @@ export default async function AdminPage() {
   }
 
   let profiles: AdminProfile[] = [];
-  let routine: AdminRoutine | null = null;
 
   if (supabaseAdmin) {
     const { data, error } = await supabaseAdmin
@@ -70,21 +68,8 @@ export default async function AdminPage() {
     } else if (data) {
       profiles = data as AdminProfile[];
     }
-
-    const { data: routineData, error: routineError } = await supabaseAdmin
-      .from("routines")
-      .select("id, title, content, created_at")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (routineError) {
-      console.error("Error obteniendo rutina para admin:", routineError);
-    } else if (routineData) {
-      routine = routineData as AdminRoutine;
-    }
   }
 
-  return <AdminDashboardClient profiles={profiles} routine={routine} />;
+  return <AdminDashboardClient profiles={profiles} />;
 }
 

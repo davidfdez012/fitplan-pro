@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
+import { Calendar, FileText, MessageCircle } from "lucide-react";
 
 type Profile = {
   id: string;
@@ -24,8 +25,6 @@ export default function DashboardPage() {
   const [editingName, setEditingName] = useState("");
   const [editingGoal, setEditingGoal] = useState("");
   const [upgrading, setUpgrading] = useState(false);
-  const [routine, setRoutine] = useState<string | null>(null);
-  const [routineError, setRoutineError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -55,28 +54,6 @@ export default function DashboardPage() {
           setEditingGoal(typed.fitness_goal ?? "");
 
           const normalizedPlan = (typed.plan || "free").toLowerCase();
-          if (normalizedPlan === "pro") {
-            try {
-              const { data: routineData, error: routineErr } = await supabase
-                .from("routines")
-                .select("title, content, created_at")
-                .order("created_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-
-              if (routineErr) {
-                setRoutineError(
-                  "No hemos podido cargar la rutina de la semana.",
-                );
-              } else if (routineData) {
-                const title = routineData.title || "Rutina de la semana";
-                const content = routineData.content || "";
-                setRoutine(`${title} — ${content}`);
-              }
-            } catch (routineCatchError) {
-              setRoutineError("Error cargando la rutina de la semana.");
-            }
-          }
         }
       } catch (e) {
         setError("Ha ocurrido un error al cargar tu panel.");
@@ -324,24 +301,45 @@ export default function DashboardPage() {
             </div>
 
             {isPro && (
-              <div className="mt-5 rounded-3xl border border-yellow-300/40 bg-gradient-to-br from-yellow-500/10 via-amber-500/5 to-lime-400/10 p-4 text-xs text-muted-foreground">
+              <div className="mt-5 rounded-3xl border border-yellow-300/40 bg-gradient-to-br from-yellow-500/10 via-amber-500/5 to-lime-400/10 p-5 shadow-[0_0_30px_rgba(250,204,21,0.15)] text-xs text-muted-foreground">
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-yellow-300">
-                  Rutina de la semana (PRO)
+                  ONBOARDING VIP - Tus Próximos Pasos
                 </p>
-                {routine && (
-                  <p className="mt-2 whitespace-pre-line text-sm text-white">
-                    {routine}
-                  </p>
-                )}
-                {!routine && !routineError && (
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Aún no hay una rutina de la semana configurada. Se mostrará
-                    aquí cuando tu coach la publique.
-                  </p>
-                )}
-                {routineError && (
-                  <p className="mt-2 text-sm text-red-300">{routineError}</p>
-                )}
+                <p className="mt-2 text-sm text-white">
+                  ¡Felicidades por dar el paso! Tu transformación acaba de empezar. Sigue estos 3 pasos para arrancar tu programa personalizado:
+                </p>
+                
+                <div className="mt-5 flex flex-col gap-3">
+                  <a href="#" className="flex items-center gap-3 rounded-2xl bg-black/60 p-3 outline-none transition hover:bg-black/80 border border-white/10 hover:border-yellow-300/50">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-300">
+                      <Calendar className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">Paso 1: Agendar Videollamada Inicial</p>
+                      <p className="text-[11px] text-zinc-400">Selecciona tu horario para conocernos 1-a-1.</p>
+                    </div>
+                  </a>
+
+                  <a href="#" className="flex items-center gap-3 rounded-2xl bg-black/60 p-3 outline-none transition hover:bg-black/80 border border-white/10 hover:border-yellow-300/50">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-300">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">Paso 2: Formulario de Valoración</p>
+                      <p className="text-[11px] text-zinc-400">Cuéntame tu punto de partida al detalle.</p>
+                    </div>
+                  </a>
+
+                  <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-lime-400/20 to-emerald-500/20 p-3 outline-none transition hover:from-lime-400/30 hover:to-emerald-500/30 border border-lime-400/50 shadow-[0_0_20px_rgba(132,204,22,0.2)]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-400/20 text-lime-400">
+                      <MessageCircle className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">Paso 3: Abrir Chat Directo</p>
+                      <p className="text-[11px] text-zinc-300">Guarda mi contacto y dime "¡Empezamos!".</p>
+                    </div>
+                  </a>
+                </div>
               </div>
             )}
           </div>
