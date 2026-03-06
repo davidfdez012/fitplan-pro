@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { coachConfig } from "@/config/coach";
 
 export default function Home() {
   return (
@@ -296,7 +297,7 @@ function Pricing() {
             Plan Pro
           </p>
           <p className="mb-2 text-lg font-semibold text-white">
-            Desde 19€ / mes
+            Desde {coachConfig.monthlyPrice}€ / mes
           </p>
           <p className="mb-4 text-xs text-muted-foreground">
             Acompañamiento completo con planes 100% personalizados y ajustes

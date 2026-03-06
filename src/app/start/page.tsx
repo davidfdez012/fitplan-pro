@@ -20,7 +20,7 @@ const fadeInUp = {
 
 export default function StartPage() {
   return (
-    <div className="min-h-screen bg-black text-zinc-50">
+    <div className="relative overflow-hidden min-h-screen bg-black text-zinc-50">
       <AnimatedBackground />
       <main className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col px-5 pb-10 pt-10">
         <motion.section
@@ -67,7 +67,7 @@ export default function StartPage() {
           variants={fadeInUp}
           transition={{ delay: 0.18, duration: 0.4, ease: "easeOut" }}
         >
-          <div className="rounded-3xl border border-lime-400/40 bg-gradient-to-b from-lime-300/10 via-zinc-950 to-black p-5 shadow-[0_0_40px_rgba(190,242,100,0.5)]">
+          <div className="rounded-3xl border border-lime-400/40 bg-gradient-to-b from-lime-300/10 via-zinc-950/80 to-black/60 backdrop-blur-md p-5 shadow-[0_0_40px_rgba(190,242,100,0.5)]">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-lime-200">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -188,7 +188,7 @@ export default function StartPage() {
           </div>
 
           <div className="space-y-3 text-left text-xs text-zinc-300">
-            <div className="rounded-2xl border border-zinc-900 bg-zinc-950 p-3">
+            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/80 backdrop-blur-md p-3">
               <p className="font-semibold text-zinc-100">
                 ¿Es para principiantes?
               </p>
@@ -197,7 +197,7 @@ export default function StartPage() {
                 nivel actual para que avances sin lesionarte.
               </p>
             </div>
-            <div className="rounded-2xl border border-zinc-900 bg-zinc-950 p-3">
+            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/80 backdrop-blur-md p-3">
               <p className="font-semibold text-zinc-100">
                 ¿Cómo accedo al contenido?
               </p>
@@ -206,7 +206,7 @@ export default function StartPage() {
                 rutinas, vídeos explicativos y seguimiento directo.
               </p>
             </div>
-            <div className="rounded-2xl border border-zinc-900 bg-zinc-950 p-3">
+            <div className="rounded-2xl border border-zinc-900 bg-zinc-950/80 backdrop-blur-md p-3">
               <p className="font-semibold text-zinc-100">
                 ¿Puedo cancelar cuando quiera?
               </p>
